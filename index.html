@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Oficina Acelera Pyme · Formulario</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --navy: #1a3060;
+    --navy-dark: #0f1f42;
+    --navy-light: #2a4a8a;
+    --green: #2bb573;
+    --green-dark: #1e8f5a;
+    --green-light: #e8f8f1;
+    --silver: #f4f6fa;
+    --border: #d1d9e6;
+    --text: #1a2440;
+    --muted: #6b7a99;
+    --white: #ffffff;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(26,48,96,0.10);
+    --shadow-lg: 0 8px 40px rgba(26,48,96,0.16);
+    --tap: 52px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--silver);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 3px solid var(--green);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    position: sticky; top: 0; z-index: 100;
+  }
+  header img { height: 52px; }
+  .header-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    background: var(--white);
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 10px;
+  }
+  .step-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  .step-pill:not(:last-child)::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    transition: background .3s;
+  }
+  .step-pill.done:not(:last-child)::after { background: var(--green); }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    background: var(--border); color: var(--muted);
+    transition: all .3s; flex-shrink: 0;
+  }
+  .step-pill.active .step-num { background: var(--navy); color: #fff; }
+  .step-pill.done .step-num { background: var(--green); color: #fff; }
+  .step-label {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .step-pill.active .step-label { color: var(--navy); }
+  .step-pill.done .step-label { color: var(--green-dark); }
+  .progress-bar-track {
+    height: 5px; background: var(--border); border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--navy), var(--green));
+    border-radius: 99px; transition: width .4s ease;
+  }
+
+  /* CONTAINER */
+  .container { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+
+  /* SECTION CARD */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 20px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy);
+    border-left: 4px solid var(--green);
+    padding-left: 10px;
+    margin-bottom: 18px;
+  }
+
+  /* FIELDS */
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+  }
+  .field label .req { color: var(--green); margin-left: 2px; }
+  input[type=text], input[type=email], input[type=date], textarea, select {
+    width: 100%;
+    height: var(--tap);
+    padding: 0 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--text);
+    background: var(--silver);
+    transition: border .2s;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+  }
+  textarea { height: 110px; padding: 12px 14px; resize: none; }
+  input:focus, textarea:focus, select:focus { border-color: var(--navy); background: #fff; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width: 540px) { .field-row { grid-template-columns: 1fr; } }
+
+  /* RADIO / CHECKBOX TILES */
+  .tile-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .tile-group.two-col { grid-template-columns: 1fr 1fr; }
+  .tile-group.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+  .tile input { display: none; }
+  .tile label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: var(--tap);
+    padding: 10px 14px;
+    background: var(--silver);
+    border: 2px solid var(--border);
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .18s;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .tile label::before {
+    content: '';
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all .18s;
+  }
+  .tile.check label::before { border-radius: 5px; }
+
+  .tile input:checked + label {
+    background: #e8eef9;
+    border-color: var(--navy);
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .tile input:checked + label::before {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+  .tile.check input:checked + label { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+  .tile.check input:checked + label::before { background: var(--green); border-color: var(--green); }
+
+  .sector-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .sector-grid .tile label { font-size: 13px; padding: 8px 12px; min-height: 46px; }
+
+  /* BUTTONS */
+  .btn-wrap { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+  .btn {
+    height: var(--tap);
+    padding: 0 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:active { background: var(--navy-dark); transform: scale(.97); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:active { background: var(--green-dark); transform: scale(.97); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--muted); }
+  .btn-outline:active { border-color: var(--navy); color: var(--navy); }
+  .btn-export { background: linear-gradient(135deg, #1a7a4a, var(--green)); color: #fff; }
+  .btn-export:active { transform: scale(.97); }
+
+  /* SUCCESS SCREEN */
+  #screen-success { display: none; }
+  .success-card {
+    background: var(--white);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg);
+    padding: 40px 28px;
+    text-align: center;
+    margin-top: 32px;
+  }
+  .success-icon { font-size: 64px; margin-bottom: 16px; }
+  .success-card h2 { color: var(--green-dark); font-size: 24px; margin-bottom: 10px; }
+  .success-card p { color: var(--muted); font-size: 16px; margin-bottom: 28px; line-height: 1.6; }
+  .count-badge {
+    display: inline-block;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-radius: 99px;
+    padding: 6px 18px;
+    font-weight: 700; font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .success-actions { display: flex; flex-direction: column; gap: 12px; }
+
+  /* SCREEN MANAGEMENT */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* LEGAL NOTE */
+  .legal-note {
+    background: #f0f4fb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .legal-note strong { color: var(--navy); }
+
+  /* OBSERVACIONES */
+  .obs-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-style: italic; }
+
+  /* Required error highlight */
+  input.error, textarea.error, select.error { border-color: #e53e3e !important; background: #fff5f5 !important; }
+  .tile.error label { border-color: #e53e3e !important; }
+  .error-msg { color: #e53e3e; font-size: 12px; margin-top: 4px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="data:image/png;base64,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" alt="Oficina Acelera Pyme" onerror="this.style.display='none'">
+  <div class="header-title">Ficha de Empresa<br>Kit Digital</div>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step-pill active" id="pill-1">
+      <div class="step-num">1</div>
+      <span class="step-label">Empresa</span>
+    </div>
+    <div class="step-pill" id="pill-2">
+      <div class="step-num">2</div>
+      <span class="step-label">Consulta</span>
+    </div>
+    <div class="step-pill" id="pill-3">
+      <div class="step-num">✓</div>
+      <span class="step-label">Enviado</span>
+    </div>
+  </div>
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="pbar" style="width:33%"></div></div>
+</div>
+
+<div class="container">
+
+<!-- ===== SCREEN 1: FICHA EMPRESA ===== -->
+<div id="screen-1" class="screen active">
+
+  <div class="card">
+    <div class="card-title">Datos de la empresa</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>NIF Empresa <span class="req">*</span></label>
+        <input type="text" id="nif" placeholder="B12345678" maxlength="9">
+      </div>
+      <div class="field">
+        <label>Razón Social <span class="req">*</span></label>
+        <input type="text" id="razon" placeholder="Nombre de la empresa">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Número de empleados <span class="req">*</span></label>
+      <div class="tile-group three-col" id="grp-empleados">
+        <div class="tile"><input type="radio" name="empleados" id="e1" value="> 250 empleados"><label for="e1">> 250 empleados</label></div>
+        <div class="tile"><input type="radio" name="empleados" id="e2" value="entre 50 y 249 empleados"><label for="e2">50 – 249 empleados</label></div>
+        <div class="tile"><input type="radio" name="empleados" id="e3" value="entre 10 y 49 empleados"><label for="e3">10 – 49 empleados</label></div>
+        <div class="tile"><input type="radio" name="empleados" id="e4" value="< 10 empleados"><label for="e4">< 10 empleados</label></div>
+        <div class="tile"><input type="radio" name="empleados" id="e5" value="Autónomo sin asalariados"><label for="e5">Autónomo sin asalariados</label></div>
+        <div class="tile"><input type="radio" name="empleados" id="e6" value="Emprendedor"><label for="e6">Emprendedor</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Inicio de actividad <span class="req">*</span></label>
+      <div class="tile-group three-col" id="grp-inicio">
+        <div class="tile"><input type="radio" name="inicio" id="i1" value="Menos de 5 años"><label for="i1">< 5 años</label></div>
+        <div class="tile"><input type="radio" name="inicio" id="i2" value="Entre 5 y 10 años"><label for="i2">5 – 10 años</label></div>
+        <div class="tile"><input type="radio" name="inicio" id="i3" value="Más de 10 años"><label for="i3">> 10 años</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sector de actividad <span class="req">*</span></div>
+    <div class="sector-grid" id="grp-sector">
+      <div class="tile"><input type="radio" name="sector" id="s1" value="A: Agricultura, ganadería, silvicultura y pesca"><label for="s1">A · Agricultura, ganadería, silvicultura y pesca</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s2" value="B: Industrias extractivas"><label for="s2">B · Industrias extractivas</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s3" value="C: Industria manufacturera"><label for="s3">C · Industria manufacturera</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s4" value="D: Suministro energía eléctrica, gas, vapor y aire acondicionado"><label for="s4">D · Suministro de energía</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s5" value="E: Suministro de agua, saneamiento, residuos"><label for="s5">E · Agua, saneamiento, residuos</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s6" value="F: Construcción"><label for="s6">F · Construcción</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s7" value="G: Comercio al por mayor y menor; reparación vehículos"><label for="s7">G · Comercio al por mayor y menor</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s8" value="H: Transporte y almacenamiento"><label for="s8">H · Transporte y almacenamiento</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s9" value="I: Hostelería"><label for="s9">I · Hostelería</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s10" value="J: Información y comunicaciones"><label for="s10">J · Información y comunicaciones</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s11" value="K: Actividades financieras y de seguros"><label for="s11">K · Financiero y seguros</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s12" value="L: Actividades inmobiliarias"><label for="s12">L · Actividades inmobiliarias</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s13" value="M: Actividades profesionales, científicas y técnicas"><label for="s13">M · Profesional, científico y técnico</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s14" value="N: Actividades administrativas y servicios auxiliares"><label for="s14">N · Administrativo y auxiliar</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s15" value="O: Administración Pública y defensa"><label for="s15">O · Administración Pública</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s16" value="P: Educación"><label for="s16">P · Educación</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s17" value="Q: Actividades sanitarias y servicios sociales"><label for="s17">Q · Sanitario y social</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s18" value="R: Artísticas, recreativas y entretenimiento"><label for="s18">R · Artístico y recreativo</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s19" value="S: Otros servicios"><label for="s19">S · Otros servicios</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s20" value="T: Hogares como empleadores / personal doméstico"><label for="s20">T · Hogares empleadores</label></div>
+      <div class="tile"><input type="radio" name="sector" id="s21" value="U: Organizaciones y organismos extraterritoriales"><label for="s21">U · Organismos extraterritoriales</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de contacto y ubicación</div>
+    <div class="field">
+      <label>Domicilio Social <span class="req">*</span></label>
+      <input type="text" id="domicilio" placeholder="Calle, número, piso...">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Código Postal <span class="req">*</span></label>
+        <input type="text" id="cp" placeholder="43500" maxlength="5">
+      </div>
+      <div class="field">
+        <label>Localidad <span class="req">*</span></label>
+        <input type="text" id="localidad" placeholder="Tortosa">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Provincia <span class="req">*</span></label>
+        <input type="text" id="provincia" placeholder="Tarragona">
+      </div>
+      <div class="field">
+        <label>Email general</label>
+        <input type="email" id="email-empresa" placeholder="info@empresa.com">
+      </div>
+    </div>
+    <div class="field">
+      <label>Página web (si existe)</label>
+      <input type="text" id="web" placeholder="www.empresa.com">
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="btn btn-primary" onclick="goTo2()">Siguiente → Datos Consulta</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: DATOS CONSULTA ===== -->
+<div id="screen-2" class="screen">
+
+  <div class="card">
+    <div class="card-title">Persona de contacto</div>
+
+    <div class="field">
+      <label>Tratamiento <span class="req">*</span></label>
+      <div class="tile-group three-col" id="grp-tratamiento">
+        <div class="tile"><input type="radio" name="tratamiento" id="t1" value="Sra."><label for="t1">Sra.</label></div>
+        <div class="tile"><input type="radio" name="tratamiento" id="t2" value="Sr."><label for="t2">Sr.</label></div>
+        <div class="tile"><input type="radio" name="tratamiento" id="t3" value="N/C"><label for="t3">N/C</label></div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Nombre <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Nombre">
+      </div>
+      <div class="field">
+        <label>Primer apellido <span class="req">*</span></label>
+        <input type="text" id="apellido1" placeholder="Primer apellido">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Segundo apellido</label>
+        <input type="text" id="apellido2" placeholder="Segundo apellido">
+      </div>
+      <div class="field">
+        <label>DNI <span class="req">*</span></label>
+        <input type="text" id="dni" placeholder="12345678A" maxlength="9">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Cargo</label>
+        <input type="text" id="cargo" placeholder="Gerente, Responsable...">
+      </div>
+      <div class="field">
+        <label>Email de contacto <span class="req">*</span></label>
+        <input type="email" id="email-contacto" placeholder="nombre@empresa.com">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de la consulta</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Fecha consulta <span class="req">*</span></label>
+        <input type="date" id="fecha">
+      </div>
+      <div class="field">
+        <label>Núm. asistentes</label>
+        <input type="text" id="asistentes" placeholder="1" maxlength="3">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Cómo nos ha conocido? <span class="req">*</span></label>
+      <div class="tile-group" id="grp-conocido">
+        <div class="tile"><input type="radio" name="conocido" id="c1" value="Eventos"><label for="c1">Eventos</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c2" value="Recomendaciones de terceros"><label for="c2">Recomendaciones</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c3" value="Prensa"><label for="c3">Prensa</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c4" value="Correo electrónico"><label for="c4">Correo electrónico</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c5" value="Web"><label for="c5">Web</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c6" value="Redes Sociales"><label for="c6">Redes Sociales</label></div>
+        <div class="tile"><input type="radio" name="conocido" id="c7" value="Otros"><label for="c7">Otros</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Canal de servicio <span class="req">*</span></label>
+      <div class="tile-group" id="grp-canal">
+        <div class="tile"><input type="radio" name="canal" id="ca1" value="Correo electrónico"><label for="ca1">Correo electrónico</label></div>
+        <div class="tile"><input type="radio" name="canal" id="ca2" value="Teléfono"><label for="ca2">Teléfono</label></div>
+        <div class="tile"><input type="radio" name="canal" id="ca3" value="Chat web"><label for="ca3">Chat web</label></div>
+        <div class="tile"><input type="radio" name="canal" id="ca4" value="Presencial"><label for="ca4">Presencial</label></div>
+        <div class="tile"><input type="radio" name="canal" id="ca5" value="Videoconferencia"><label for="ca5">Videoconferencia</label></div>
+        <div class="tile"><input type="radio" name="canal" id="ca6" value="Otros"><label for="ca6">Otros</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Temática de la consulta <span class="req">*</span></div>
+    <div class="sector-grid" id="grp-tematica">
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm1" value="Marketing digital y redes sociales"><label for="tm1">Marketing digital y redes sociales</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm2" value="Presencia Web"><label for="tm2">Presencia Web</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm3" value="Estrategia"><label for="tm3">Estrategia</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm4" value="Comercio electrónico"><label for="tm4">Comercio electrónico</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm5" value="Ciberseguridad"><label for="tm5">Ciberseguridad</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm6" value="Teletrabajo"><label for="tm6">Teletrabajo</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm7" value="Infraestructuras"><label for="tm7">Infraestructuras</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm8" value="Inteligencia de Negocio (Big Data y D&A)"><label for="tm8">Inteligencia de Negocio (Big Data)</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm9" value="Gestión de clientes / CRM"><label for="tm9">Gestión de clientes / CRM</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm10" value="Planificación de recursos / ERP"><label for="tm10">Planificación de recursos / ERP</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm11" value="Blockchain"><label for="tm11">Blockchain</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm12" value="Financiación y ayudas"><label for="tm12">Financiación y ayudas</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm13" value="Internet de las cosas"><label for="tm13">Internet de las cosas</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm14" value="Protección de datos"><label for="tm14">Protección de datos</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm15" value="Robótica"><label for="tm15">Robótica</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm16" value="Soluciones Cloud"><label for="tm16">Soluciones Cloud</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm17" value="Chatbot"><label for="tm17">Chatbot</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm18" value="Biometría - Identidad digital"><label for="tm18">Biometría / Identidad digital</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm19" value="Realidad Virtual y Aumentada"><label for="tm19">Realidad Virtual y Aumentada</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm20" value="Impresión 3D"><label for="tm20">Impresión 3D</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm21" value="Inteligencia Artificial"><label for="tm21">Inteligencia Artificial</label></div>
+      <div class="tile check"><input type="checkbox" name="tematica" id="tm22" value="Metodologías ágiles"><label for="tm22">Metodologías ágiles</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Observaciones</div>
+    <p class="obs-label">Descripción de la consulta y resumen del asesoramiento prestado</p>
+    <div class="field">
+      <textarea id="observaciones" placeholder="Describa aquí el motivo de la consulta y el asesoramiento recibido..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Protección de datos</div>
+    <div class="legal-note">
+      <strong>Información básica sobre protección de datos:</strong> Los datos proporcionados serán tratados por <strong>Cámara de España</strong> y <strong>Cámara de Comercio de Tortosa</strong> en régimen de corresponsabilidad, con la finalidad de gestionar el Programa Oficinas Acelera Pyme para Kit Digital. Conservación: 5 años tras la finalización del Programa. Puede ejercer sus derechos escribiendo a <strong>tortosa@cambratortosa.com</strong>.
+    </div>
+    <div class="tile check" style="max-width:100%">
+      <input type="checkbox" id="rgpd">
+      <label for="rgpd" style="font-size:14px">He leído y acepto el tratamiento de mis datos según la información de protección de datos <span class="req">*</span></label>
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="btn btn-outline" onclick="goTo1()">← Volver</button>
+    <button class="btn btn-success" onclick="enviarFormulario()">✓ Guardar registro</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN SUCCESS ===== -->
+<div id="screen-success" class="screen">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Registro guardado</h2>
+    <p>Los datos han quedado registrados.<br>Puede descargar el Excel acumulado con todos los registros.</p>
+    <div class="count-badge" id="count-label">1 registro guardado</div>
+    <div class="success-actions">
+      <button class="btn btn-export" style="justify-content:center" onclick="exportExcel()">⬇ Descargar Excel acumulado</button>
+      <button class="btn btn-primary" style="justify-content:center" onclick="nuevoRegistro()">+ Nuevo registro</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ──────────────────────────────────────────────
+// STORAGE KEY
+const STORAGE_KEY = 'acelera_pyme_registros_v1';
+
+function getRegistros() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveRegistros(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.remove('active');
+  document.getElementById('screen-' + id).style.display = 'block';
+  // re-apply active
+  document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; });
+  const el = id === 'success' ? document.getElementById('screen-success') : document.getElementById('screen-' + id);
+  el.style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function setPills(step) {
+  for (let i = 1; i <= 3; i++) {
+    const p = document.getElementById('pill-' + i);
+    p.classList.remove('active','done');
+    if (i < step) p.classList.add('done');
+    if (i === step) p.classList.add('active');
+  }
+  const pct = step === 1 ? 33 : step === 2 ? 66 : 100;
+  document.getElementById('pbar').style.width = pct + '%';
+}
+
+function goTo1() {
+  document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+  document.getElementById('screen-1').style.display='block';
+  setPills(1); window.scrollTo(0,0);
+}
+
+function goTo2() {
+  if (!validateStep1()) return;
+  document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+  document.getElementById('screen-2').style.display='block';
+  setPills(2); window.scrollTo(0,0);
+}
+
+// ──────────────────────────────────────────────
+// VALIDATION
+function clearErrors() {
+  document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+  document.querySelectorAll('.error-msg').forEach(el => el.remove());
+}
+
+function markError(el, msg) {
+  el.classList.add('error');
+  const em = document.createElement('div');
+  em.className = 'error-msg'; em.textContent = msg;
+  el.parentNode.appendChild(em);
+}
+
+function getRadio(name) {
+  const el = document.querySelector('input[name="'+name+'"]:checked');
+  return el ? el.value : '';
+}
+
+function validateStep1() {
+  clearErrors(); let ok = true;
+  const fields = [
+    ['nif','NIF obligatorio'],
+    ['razon','Razón Social obligatoria'],
+    ['domicilio','Domicilio obligatorio'],
+    ['cp','Código Postal obligatorio'],
+    ['localidad','Localidad obligatoria'],
+    ['provincia','Provincia obligatoria'],
+  ];
+  fields.forEach(([id, msg]) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { markError(el, msg); ok = false; }
+  });
+  if (!getRadio('empleados')) {
+    document.getElementById('grp-empleados').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione número de empleados';
+    document.getElementById('grp-empleados').after(em); ok = false;
+  }
+  if (!getRadio('inicio')) {
+    document.getElementById('grp-inicio').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione inicio de actividad';
+    document.getElementById('grp-inicio').after(em); ok = false;
+  }
+  if (!getRadio('sector')) {
+    document.getElementById('grp-sector').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione sector de actividad';
+    document.getElementById('grp-sector').after(em); ok = false;
+  }
+  if (!ok) window.scrollTo(0,0);
+  return ok;
+}
+
+function validateStep2() {
+  clearErrors(); let ok = true;
+  const fields = [
+    ['nombre','Nombre obligatorio'],
+    ['apellido1','Primer apellido obligatorio'],
+    ['dni','DNI obligatorio'],
+    ['email-contacto','Email de contacto obligatorio'],
+    ['fecha','Fecha obligatoria'],
+  ];
+  fields.forEach(([id, msg]) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { markError(el, msg); ok = false; }
+  });
+  if (!getRadio('tratamiento')) {
+    document.getElementById('grp-tratamiento').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione tratamiento';
+    document.getElementById('grp-tratamiento').after(em); ok = false;
+  }
+  if (!getRadio('conocido')) {
+    document.getElementById('grp-conocido').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione cómo nos conoció';
+    document.getElementById('grp-conocido').after(em); ok = false;
+  }
+  if (!getRadio('canal')) {
+    document.getElementById('grp-canal').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione canal de servicio';
+    document.getElementById('grp-canal').after(em); ok = false;
+  }
+  const tematicas = [...document.querySelectorAll('input[name="tematica"]:checked')];
+  if (!tematicas.length) {
+    document.getElementById('grp-tematica').classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Seleccione al menos una temática';
+    document.getElementById('grp-tematica').after(em); ok = false;
+  }
+  if (!document.getElementById('rgpd').checked) {
+    const el = document.getElementById('rgpd');
+    el.parentNode.classList.add('error');
+    const em = document.createElement('div'); em.className='error-msg'; em.textContent='Debe aceptar la protección de datos';
+    el.parentNode.after(em); ok = false;
+  }
+  if (!ok) window.scrollTo(0,0);
+  return ok;
+}
+
+// ──────────────────────────────────────────────
+// ENVÍO
+function enviarFormulario() {
+  if (!validateStep2()) return;
+
+  const tematicas = [...document.querySelectorAll('input[name="tematica"]:checked')]
+    .map(el => el.value).join('; ');
+
+  const registro = {
+    'Fecha Registro': new Date().toLocaleString('es-ES'),
+    'NIF Empresa': document.getElementById('nif').value.trim().toUpperCase(),
+    'Razón Social': document.getElementById('razon').value.trim(),
+    'Empleados': getRadio('empleados'),
+    'Inicio Actividad': getRadio('inicio'),
+    'Sector': getRadio('sector'),
+    'Domicilio': document.getElementById('domicilio').value.trim(),
+    'CP': document.getElementById('cp').value.trim(),
+    'Localidad': document.getElementById('localidad').value.trim(),
+    'Provincia': document.getElementById('provincia').value.trim(),
+    'Email Empresa': document.getElementById('email-empresa').value.trim(),
+    'Web': document.getElementById('web').value.trim(),
+    'Tratamiento': getRadio('tratamiento'),
+    'Nombre': document.getElementById('nombre').value.trim(),
+    'Apellido 1': document.getElementById('apellido1').value.trim(),
+    'Apellido 2': document.getElementById('apellido2').value.trim(),
+    'DNI': document.getElementById('dni').value.trim().toUpperCase(),
+    'Cargo': document.getElementById('cargo').value.trim(),
+    'Email Contacto': document.getElementById('email-contacto').value.trim(),
+    'Fecha Consulta': document.getElementById('fecha').value,
+    'Num Asistentes': document.getElementById('asistentes').value.trim(),
+    'Cómo Nos Conoció': getRadio('conocido'),
+    'Canal Servicio': getRadio('canal'),
+    'Temáticas': tematicas,
+    'Observaciones': document.getElementById('observaciones').value.trim(),
+  };
+
+  const registros = getRegistros();
+  registros.push(registro);
+  saveRegistros(registros);
+
+  // Show success
+  document.querySelectorAll('.screen').forEach(s => s.style.display='none');
+  document.getElementById('screen-success').style.display='block';
+  setPills(3);
+  const n = registros.length;
+  document.getElementById('count-label').textContent = n + (n===1 ? ' registro guardado' : ' registros guardados');
+  window.scrollTo(0,0);
+}
+
+// ──────────────────────────────────────────────
+// EXPORT EXCEL
+function exportExcel() {
+  const registros = getRegistros();
+  if (!registros.length) { alert('No hay registros guardados.'); return; }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(registros);
+
+  // Column widths
+  const cols = Object.keys(registros[0]).map(k => ({ wch: Math.max(k.length, 20) }));
+  ws['!cols'] = cols;
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Registros Acelera Pyme');
+
+  const fecha = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, 'AceleraPyme_Registros_' + fecha + '.xlsx');
+}
+
+// ──────────────────────────────────────────────
+// NUEVO REGISTRO
+function nuevoRegistro() {
+  // Reset all inputs
+  document.querySelectorAll('input[type=text], input[type=email], input[type=date], textarea').forEach(el => el.value = '');
+  document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(el => el.checked = false);
+  clearErrors();
+  goTo1();
+}
+
+// ──────────────────────────────────────────────
+// INIT: set today's date
+window.addEventListener('load', () => {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('fecha').value = today;
+  // Show initial screen
+  document.getElementById('screen-1').style.display = 'block';
+});
+</script>
+</body>
+</html>
