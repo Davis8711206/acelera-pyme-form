@@ -144,17 +144,25 @@
     background: #C00000;
   }
   .check-btn .box {
-    width: 16px; height: 16px;
-    border: 2px solid #ccc;
+    width: 18px; height: 18px;
+    border: 2px solid #bbb;
     border-radius: 3px;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
+    font-size: 0;
+    color: transparent;
   }
   .check-btn.selected .box {
     border-color: #C00000;
     background: #C00000;
+    font-size: 12px;
     color: white;
-    font-size: 11px;
+  }
+  .check-btn.selected .box::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    line-height: 1;
   }
   
   .checkbox-grid {
@@ -471,28 +479,28 @@
     <div class="field-group">
       <label class="field-label">Temática <span class="required">*</span> (puede seleccionar varias)</label>
       <div class="checkbox-grid">
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Marketing digital y redes sociales">Marketing digital y redes sociales</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Financiación y ayudas">Financiación y ayudas</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Presencia Web">Presencia Web</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Internet de las cosas">Internet de las cosas</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Estrategia">Estrategia</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Protección de datos">Protección de datos</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Comercio electrónico">Comercio electrónico</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Robótica">Robótica</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Ciberseguridad">Ciberseguridad</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Soluciones Cloud">Soluciones Cloud</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Teletrabajo">Teletrabajo</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Chatbot">Chatbot</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Infraestructuras">Infraestructuras</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Biometría - Identidad digital">Biometría - Identidad digital</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Inteligencia de Negocio (Big Data)">Inteligencia de Negocio / Big Data</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Realidad Virtual y Aumentada">Realidad Virtual y Aumentada</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Gestión de clientes / CRM">Gestión de clientes / CRM</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Impresión 3D">Impresión 3D</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Planificación de recursos / ERP">Planificación de recursos / ERP</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Inteligencia Artificial">Inteligencia Artificial</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Blockchain">Blockchain</label>
-        <label class="check-btn" onclick="toggleCheck(this)"><span class="box">✓</span><input type="checkbox" name="tematica" value="Metodologías ágiles">Metodologías ágiles</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Marketing digital y redes sociales">Marketing digital y redes sociales</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Financiación y ayudas">Financiación y ayudas</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Presencia Web">Presencia Web</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Internet de las cosas">Internet de las cosas</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Estrategia">Estrategia</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Protección de datos">Protección de datos</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Comercio electrónico">Comercio electrónico</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Robótica">Robótica</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Ciberseguridad">Ciberseguridad</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Soluciones Cloud">Soluciones Cloud</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Teletrabajo">Teletrabajo</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Chatbot">Chatbot</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Infraestructuras">Infraestructuras</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Biometría - Identidad digital">Biometría - Identidad digital</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Inteligencia de Negocio (Big Data)">Inteligencia de Negocio / Big Data</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Realidad Virtual y Aumentada">Realidad Virtual y Aumentada</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Gestión de clientes / CRM">Gestión de clientes / CRM</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Impresión 3D">Impresión 3D</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Planificación de recursos / ERP">Planificación de recursos / ERP</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Inteligencia Artificial">Inteligencia Artificial</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Blockchain">Blockchain</label>
+        <label class="check-btn" onclick="toggleCheck(this)"><span class="box"></span><input type="checkbox" name="tematica" value="Metodologías ágiles">Metodologías ágiles</label>
       </div>
       <div class="field-error" id="err-tematica">Selecciona al menos una temática</div>
     </div>
@@ -503,12 +511,12 @@
     </div>
     
     <div class="rgpd-box">
-      <strong>Protección de Datos:</strong> Los datos proporcionados serán tratados por Cámara de España y Cámara de Comercio de Tortosa en régimen de corresponsabilidad para la gestión del Programa Oficinas Acelera Pyme para Kit Digital. Conservados 5 años tras la finalización del Programa. Puede ejercer sus derechos escribiendo a tortosa@cambratortosa.com.
+      <strong>Protección de Datos:</strong> Los datos proporcionados serán tratados por Cámara de España y Cámara de Comercio de Tortosa en régimen de corresponsabilidad para la gestión del Programa Oficinas Acelera Pyme para Kit Digital. Conservados 5 años tras la finalización del Programa. Puede ejercer sus derechos escribiendo a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e0948f92948f9381a083818d829281948f92948f9381ce838f8d">[email&#160;protected]</a>.
     </div>
     
     <div class="field-group">
       <label class="check-btn" onclick="toggleCheck(this)" id="rgpd-btn" style="width:100%">
-        <span class="box">✓</span>
+        <span class="box"></span>
         <input type="checkbox" id="rgpd">
         <span>He leído y acepto la política de protección de datos <strong style="color:#C00000">*</strong></span>
       </label>
@@ -534,7 +542,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===================== RADIO / CHECKBOX =====================
 function selectRadio(label, name) {
   document.querySelectorAll('[name="' + name + '"]').forEach(function(el) {
@@ -766,14 +774,4 @@ function newRecord() {
   document.getElementById('pill1').classList.remove('inactive');
   document.getElementById('pill2').classList.remove('active');
   document.getElementById('pill2').classList.add('inactive');
-  window.scrollTo(0, 0);
-}
-
-// Set today's date by default
-document.addEventListener('DOMContentLoaded', function() {
-  var today = new Date().toISOString().split('T')[0];
-  document.getElementById('fecha').value = today;
-});
-</script>
-</body>
-</html>
+  window.scroll
